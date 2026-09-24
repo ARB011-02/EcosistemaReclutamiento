@@ -1,0 +1,614 @@
+{
+  "name": "Ecosistema Reclutamiento IA - Principal",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nueva-postulacion",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -96
+      ],
+      "id": "c94521b8-8203-4728-bc34-670e19e901f9",
+      "name": "Webhook",
+      "webhookId": "14c1aea2-4e17-4651-a415-b5ef4fb99281"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "e9be45aa-1e3f-480d-b6a8-4613cd0a0433",
+              "leftValue": "={{ $json.body.nombre }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "9ee3eba2-679d-4281-9064-5682109ed439",
+              "leftValue": "= {{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "51188da2-995c-46cf-b46f-d9e727b31a5c",
+              "leftValue": "={{ $json.body.puesto }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "447d1acf-d28d-47fd-bf0e-48e971d21f9c",
+              "leftValue": "={{ $json.body.cv_url }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "b38011ce-50d4-441f-aeb4-82b82f3548aa",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appHOaYLo5xVjCPQv",
+          "mode": "list",
+          "cachedResultName": "Ecosistema Reclutamiento IA",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblJjSjkNkrpkK74R",
+          "mode": "list",
+          "cachedResultName": "Vacantes",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv/tblJjSjkNkrpkK74R"
+        },
+        "filterByFormula": "='{{ $json.body.puesto }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -96
+      ],
+      "id": "43fa038a-acc6-454f-8e06-5a8b8c0fb0d0",
+      "name": "Search records",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "jtyF7al3lNQmaQwV",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f7c05daf-c2fd-464a-9326-071c21a30449",
+              "leftValue": "= {{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "25a87f01-1034-4aa4-84ac-cfa9692c1b18",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appHOaYLo5xVjCPQv",
+          "mode": "list",
+          "cachedResultName": "Ecosistema Reclutamiento IA",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblX56EqsUJKJbmr7",
+          "mode": "list",
+          "cachedResultName": "Log_Errores",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv/tblX56EqsUJKJbmr7"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Mensaje_error": "={{ 'Vacante no encontrada: ' + $('Webhook').item.json.body.puesto }}",
+            "Modulo_fallido": "Airtable",
+            "Reintentos": 0
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Mensaje_error",
+              "displayName": "Mensaje_error",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Modulo_fallido",
+              "displayName": "Modulo_fallido",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Nodo IA",
+                  "value": "Nodo IA"
+                },
+                {
+                  "name": "Gmail",
+                  "value": "Gmail"
+                },
+                {
+                  "name": "Airtable",
+                  "value": "Airtable"
+                },
+                {
+                  "name": "Webhook",
+                  "value": "Webhook"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Reintentos",
+              "displayName": "Reintentos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Candidato",
+              "displayName": "Candidato",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Nombre (from Candidato)",
+              "displayName": "Nombre (from Candidato)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        0
+      ],
+      "id": "68f9f77a-9bb1-4a05-bb91-e77707749492",
+      "name": "Create a record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "jtyF7al3lNQmaQwV",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appHOaYLo5xVjCPQv",
+          "mode": "list",
+          "cachedResultName": "Ecosistema Reclutamiento IA",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl6nfjTThrQfYwU3",
+          "mode": "list",
+          "cachedResultName": "Candidatos",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv/tbl6nfjTThrQfYwU3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado_Contacto": false,
+            "Estado": "Pendiente",
+            "Puesto": "={{ [$json.id] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefono",
+              "displayName": "Telefono",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "CV_URL",
+              "displayName": "CV_URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Procesado por IA ",
+                  "value": "Procesado por IA "
+                },
+                {
+                  "name": "Pendiente de aprobación humana",
+                  "value": "Pendiente de aprobación humana"
+                },
+                {
+                  "name": "Aprobado por Humano ",
+                  "value": "Aprobado por Humano "
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Entrevista Agendada ",
+                  "value": "Entrevista Agendada "
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score_IA",
+              "displayName": "Score_IA",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Resumen_IA",
+              "displayName": "Resumen_IA",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Gmail_Thread_ID",
+              "displayName": "Gmail_Thread_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado_Contacto",
+              "displayName": "Aprobado_Contacto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Puesto",
+              "displayName": "Puesto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Puesto (from Puesto)",
+              "displayName": "Puesto (from Puesto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Log_Errores",
+              "displayName": "Log_Errores",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        -192
+      ],
+      "id": "c347c439-16f2-43f7-b818-4944d1df31f1",
+      "name": "Create a record1",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "jtyF7al3lNQmaQwV",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"model\": \"claude-sonnet-5\", \"max_tokens\": 300, \"system\": \"Actua como Analista Senior de RRHH. Pensa paso a paso antes de responder. Evalua al candidato contra los requisitos de la vacante y devolve SOLO un JSON con este formato exacto: {\\\"score\\\": numero de 0 a 100, \\\"resumen\\\": \\\"texto breve\\\"}. No agregues texto fuera del JSON.\", \"messages\": [ { \"role\": \"user\", \"content\": \"Requisitos de la vacante: {{ $('Search records').item.json.fields.Requisitos_clave }}\\n\\nCV del candidato: {{ $('Webhook').item.json.body.cv_texto }}\" } ] }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        -192
+      ],
+      "id": "d06b4880-18e0-4e2c-95a4-3c0676cf9c03",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "1dXiU1sNQz4mpVm4",
+          "name": "Header Auth account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create a record1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "bb83564e-14a3-4d11-af3b-67559ea8c9ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6ae58d59a4e1277736ef044bae63a8c076a87ef7cd040974c2b8e1785268c643"
+  },
+  "nodeGroups": [],
+  "id": "eeKR8cFW36Zz1PzM",
+  "tags": []
+}
