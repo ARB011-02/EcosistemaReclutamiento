@@ -1,0 +1,414 @@
+{
+  "name": "Ecosistema Reclutamiento IA - Aprobaciones",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableOAuth2Api",
+        "baseId": {
+          "__rl": true,
+          "value": "appHOaYLo5xVjCPQv",
+          "mode": "id"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "tbl6nfjTThrQfYwU3",
+          "mode": "id"
+        },
+        "triggerField": "Ultima_Modificacion",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "04c66233-8abb-4ff0-8cb1-0fd69f594d92",
+      "name": "Airtable Trigger",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "jtyF7al3lNQmaQwV",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "972f647d-7b4f-48b0-9f7a-05b605425aea",
+              "leftValue": "={{ $json.fields.Aprobado_Contacto }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "2150edec-0c3d-4478-8fc6-01f0ce6578b1",
+              "leftValue": "={{ $json.fields.Estado }}",
+              "rightValue": "Pendiente de aprobación humana",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "0e44b759-39a9-4735-ae11-447cfa86f789",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.fields.email }} ",
+        "subject": "={{ 'Entrevista para ' + $json.fields['puesto (from puesto)'][0] }}",
+        "message": "={{ 'Hola ' + $json.fields.nombre + ', queremos coordinar una entrevista para el puesto de ' + $json.fields['puesto (from puesto)'][0] + '. Nos pondremos en contacto a la brevedad para coordinar fecha y horario.' }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        -32
+      ],
+      "id": "ea9eae4a-093d-47d2-8e6a-b7fcc9d721ed",
+      "name": "Send a message",
+      "webhookId": "3ce6b76b-3cb6-4416-abf6-c05beae0536e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dpx7Xi5SnsQ5TkV3",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appHOaYLo5xVjCPQv",
+          "mode": "list",
+          "cachedResultName": "Ecosistema Reclutamiento IA",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl6nfjTThrQfYwU3",
+          "mode": "list",
+          "cachedResultName": "Candidatos",
+          "cachedResultUrl": "https://airtable.com/appHOaYLo5xVjCPQv/tbl6nfjTThrQfYwU3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado_Contacto": false,
+            "id": "={{ $json.id }} ",
+            "Gmail_Thread_ID": "={{ $('Send a message').item.json.threadId }}",
+            "Estado": "Entrevista Agendada "
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "nombre",
+              "displayName": "nombre",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "telefono",
+              "displayName": "telefono",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "puesto",
+              "displayName": "puesto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pendiente",
+                  "value": "Pendiente"
+                },
+                {
+                  "name": "Procesado por IA ",
+                  "value": "Procesado por IA "
+                },
+                {
+                  "name": "Pendiente de aprobación humana",
+                  "value": "Pendiente de aprobación humana"
+                },
+                {
+                  "name": "Aprobado por Humano ",
+                  "value": "Aprobado por Humano "
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Entrevista Agendada ",
+                  "value": "Entrevista Agendada "
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "cv_texto",
+              "displayName": "cv_texto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Score_IA",
+              "displayName": "Score_IA",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Resumen_IA",
+              "displayName": "Resumen_IA",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Aprobado_Contacto",
+              "displayName": "Aprobado_Contacto",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Gmail_Thread_ID",
+              "displayName": "Gmail_Thread_ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ultima_Modificacion",
+              "displayName": "Ultima_Modificacion",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "puesto (from puesto)",
+              "displayName": "puesto (from puesto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Log_Errores",
+              "displayName": "Log_Errores",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Resumen (cv_texto)",
+              "displayName": "Resumen (cv_texto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Titular (cv_texto)",
+              "displayName": "Titular (cv_texto)",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "e497f597-b623-4e23-b14a-aca2c4156763",
+      "name": "Update record",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "jtyF7al3lNQmaQwV",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "0d60acdf-64e0-40ab-8136-abef08cc7460",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6ae58d59a4e1277736ef044bae63a8c076a87ef7cd040974c2b8e1785268c643"
+  },
+  "nodeGroups": [],
+  "id": "dGffeY9x1uM1sC7l",
+  "tags": []
+}
